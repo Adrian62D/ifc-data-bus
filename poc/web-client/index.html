@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>IFC Data Bus Client</title>
+    <!-- Include MQTT.js library from a CDN -->
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #messages { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; }
+        .message { margin: 5px 0; }
+    </style>
+</head>
+<body>
+<h1>MQTT Messages</h1>
+<div id="messages"></div>
+<script>
+    const brokerUrl = 'ws://localhost:8083/mqtt'
+    const client = mqtt.connect(brokerUrl);
+    const topic = 'my/test/topic';
+    client.on('connect', () => {
+        console.log('Connected to MQTT broker.');
+        client.subscribe(topic, (err) => {
+            if (err) {
+                console.error('Subscription error:', err);
+            } else {
+                console.log(`Subscribed to topic: ${topic}`);
+            }
+        });
+    });
+
+    client.on('message', (receivedTopic, payload) => {
+        const message = payload.toString();
+        console.log(`Message received on ${receivedTopic}: ${message}`);
+        const messagesDiv = document.getElementById('messages');
+        const messageElement = document.createElement('p');
+        messageElement.className = 'message';
+        messageElement.textContent = `Topic: ${receivedTopic} - Message: ${message}`;
+        messagesDiv.appendChild(messageElement);
+    });
+
+    client.on('error', (err) => {
+        console.error('Connection error: ', err);
+        client.end();
+    });
+</script>
+</body>
+</html>
