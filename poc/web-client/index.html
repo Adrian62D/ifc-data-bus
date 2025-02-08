@@ -36,15 +36,61 @@
                         <label for="jsonInput" class="block text-gray-700 font-bold mb-2">
                             JSON Message
                         </label>
-                        <textarea id="jsonInput" class="w-full p-2 border border-gray-300 rounded" rows="10">{
-  "id": "e36f6e87-9990-499d-ab5b-01e6edf9e30a",
-  "entity_type": "IfcWall",
-  "crdt_data": "hW9Kg7DtzvYAmgIBENNTgN5j203JguKISy/kCiQB3MwUw3wuzfgHb0rs+hXu+5V0kQjwYy+t3f6G+NWAYqEHAQIDAhMDIwJAA0MCVgIKAQQCBBVQIQIjCzQBQgZWD1c0gAECAgACAX4FBAIAfgABfwACBwAFBAAABQQBdwRkYXRhC2VudGl0eV90eXBlDXJlbGF0aW9uc2hpcHMKcmVwbGljYV9pZAl0aW1lc3RhbXAGaGVpZ2h0CG1hdGVyaWFsBG5hbWUFd2lkdGgJAHsBAn8CAQICfn0CCX0AAQAGAXwAdgCGAQKFAX2GAVaFAUlmY1dhbGxyZXBsaWNhMdzZ/fPZ6dlBAAAAAAAACEBDb25jcmV0ZVdhbGwxAAAAAAAAAEAJAAE=",
-  "replica_id": "replica1",
-  "timestamp": 1739024335.966422,
-  "parent_id": null,
-  "changeset_id": null
-}</textarea>
+                        <textarea id="jsonInput" class="w-full p-2 border border-gray-300 rounded" rows="10">
+{
+    "type": "ifcJSON",
+    "version": "0.0.1",
+    "schemaIdentifier": "IFC4",
+    "data": [
+        {
+            "type": "IfcMaterialLayerSet",
+            "associatedTo": [
+                {
+                    "type": "IfcRelAssociatesMaterial",
+                    "globalId": "8d0fbb28-fe53-488a-a92b-a5a3c1af7a74",
+                    "name": "MatAssoc",
+                    "description": "Material Associates",
+                    "relatedObjects": [
+                        {
+                            "type": "IfcWallType",
+                            "ref": "909e31f1-aec1-4242-8f2c-e2425a98a449"
+                        }
+                    ]
+                }
+            ],
+            "materialLayers": [
+                {
+                    "type": "IfcMaterialLayer",
+                    "material": {
+                        "type": "IfcMaterial",
+                        "name": "Masonry - Brick - Brown"
+                    },
+                    "layerThickness": 110.0,
+                    "isVentilated": false,
+                    "name": "Finish"
+                },
+                {
+                    "type": "IfcMaterialLayer",
+                    "layerThickness": 50.0,
+                    "isVentilated": true,
+                    "name": "Air Infiltration Barrier"
+                },
+                {
+                    "type": "IfcMaterialLayer",
+                    "material": {
+                        "type": "IfcMaterial",
+                        "name": "Masonry"
+                    },
+                    "layerThickness": 110.0,
+                    "isVentilated": false,
+                    "name": "Core"
+                }
+            ],
+            "layerSetName": "Double Brick - 270"
+        }
+    ]
+}
+</textarea>
                     </div>
                     <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-gray font-bold py-2 px-4 rounded">
                         Publish
