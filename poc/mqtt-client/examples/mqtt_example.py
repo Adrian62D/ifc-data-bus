@@ -7,25 +7,91 @@ from ifc_databus.core.bus import IfcBus
 from compas_eve import set_default_transport
 from compas_eve.mqtt import MqttTransport
 
-
-
 def run_mqtt_example():
     """Run the MQTT example."""
     set_default_transport(MqttTransport("nanomq-broker", 1883))
 
     print("=== Starting MQTT Example ===")
-    
     # Create two bus instances
     bus_a = IfcBus("replica1")
     bus_b = IfcBus("replica2")
-    
+
     # Connect to MQTT broker and wait for connections
     bus_a.connect()
     bus_b.connect()
     sleep(1)
+
+    run_integration(bus_a, bus_b)
+    run_example(bus_a, bus_b)
     
+    # Cleanup
+    bus_a.disconnect()
+    bus_b.disconnect()
+
+def run_integration(bus_a, bus_b):
+    # Example Object
+    wall_id = bus_a.publish_entity("IfcWall", {
+        "operation_type": "update",
+        "author": "Roman Rust",
+        "timestamp": 1689529600,
+        "globalId": "8d0fbb28-fe53-488a-a92b-a5a3c1af7a75",
+        "data": {
+                "type": "IfcMaterialLayerSet",
+                "associatedTo": [
+                    {
+                        "type": "IfcRelAssociatesMaterial",
+                        "globalId": "8d0fbb28-fe53-488a-a92b-a5a3c1af7a74",
+                        "name": "MatAssoc",
+                        "description": "Material Associates",
+                        "relatedObjects": [
+                            {
+                                "type": "IfcWallType",
+                                "ref": "909e31f1-aec1-4242-8f2c-e2425a98a449"
+                            }
+                        ]
+                    }
+                ],
+                "materialLayers": [
+                    {
+                        "type": "IfcMaterialLayer",
+                        "material": {
+                            "type": "IfcMaterial",
+                            "name": "Masonry - Brick - Brown"
+                        },
+                        "layerThickness": 110.0,
+                        "isVentilated": "false",
+                        "name": "Finish"
+                    },
+                    {
+                        "type": "IfcMaterialLayer",
+                        "layerThickness": 50.0,
+                        "isVentilated": "true",
+                        "name": "Air Infiltration Barrier"
+                    },
+                    {
+                        "type": "IfcMaterialLayer",
+                        "material": {
+                            "type": "IfcMaterial",
+                            "name": "Masonry"
+                        },
+                        "layerThickness": 110.0,
+                        "isVentilated": "false",
+                        "name": "Core"
+                    }
+                ],
+                "layerSetName": "Double Brick - 270"
+            }
+    })
+    sleep(5)  # Increased delay to ensure wall is synchronized
+    wall_a = bus_a._registers[wall_id]
+    print("\nFinal state in Replica A:")
+    print(f"Wall entity: {wall_a.entity_type}")
+    print(f"Properties: {wall_a.data}")
+    print(f"Relationships: {wall_a.relationships}")
+
+def run_example(bus_a, bus_b):
     # Send sync messages to ensure both replicas are connected
-    bus_a.publish_entity("IfcWall", {
+    bus_a.publish_entity("IfcElement", {
         "name": "SyncWall",
         "height": 1.0,
         "width": 1.0,
@@ -36,16 +102,16 @@ def run_mqtt_example():
         "width": 1.0,
     })
     sleep(3)  # Increased delay to ensure sync
-    
+
     # Create a wall in replica A
-    wall_id = bus_a.publish_entity("IfcWall", {
+    wall_id = bus_a.publish_entity("IfcElement", {
         "name": "Wall1",
         "height": 3.0,
         "width": 2.0,
         "material": "Concrete",
     })
     sleep(5)  # Increased delay to ensure wall is synchronized
-    
+
     # Create a window in replica B
     window_id = bus_b.publish_entity("IfcWindow", {
         "name": "Window1",
@@ -53,7 +119,7 @@ def run_mqtt_example():
         "width": 0.8,
         "material": "Glass",
     })
-    
+
     # Add relationship between wall and window
     bus_b.add_relationship(
         source_id=wall_id,
@@ -65,7 +131,7 @@ def run_mqtt_example():
         }
     )
     sleep(5)  # Increased delay to ensure relationship is synchronized
-    
+
     # Make concurrent modifications
     bus_a.update_entity(wall_id, {"height": 3.5})
     bus_b.update_entity(wall_id, {
@@ -73,24 +139,19 @@ def run_mqtt_example():
         "thermal_resistance": 0.5,
     })
     sleep(5)  # Ensure updates are processed
-    
+
     # Print final state
     wall_a = bus_a._registers[wall_id]
     print("\nFinal state in Replica A:")
     print(f"Wall entity: {wall_a.entity_type}")
     print(f"Properties: {wall_a.data}")
     print(f"Relationships: {wall_a.relationships}")
-    
+
     print("\nFinal state in Replica B:")
     wall_b = bus_b._registers[wall_id]
     print(f"Entity type: {wall_b.entity_type}")
     print(f"Data: {wall_b.data}")
     print(f"Relationships: {wall_b.relationships}")
-    
-    # Cleanup
-    bus_a.disconnect()
-    bus_b.disconnect()
-
 
 if __name__ == "__main__":
     run_mqtt_example()
