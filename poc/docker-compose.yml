@@ -1,20 +1,42 @@
 version: '3.8'
 
+networks:
+  mqtt_network:
+
 services:
   nanomq:
     image: emqx/nanomq:0.18.2-full
     container_name: nanomq-broker
+    networks:
+      - mqtt_network
+    environment:
+      - NANOMQ_LOG_LEVEL=debug  # Enable detailed logs
+      - NANOMQ_WS_ENABLE=true  # Enable WebSockets
+      - NANOMQ_WS_PORT=8083  # Set WebSocket port
+      - NANOMQ_WS_URL=/mqtt  # **Ensure WebSocket path is set**
     ports:
       - "1883:1883"   # MQTT port
       - "8083:8083"   # WebSockets
     restart: always
+
   web-client:
     build:
       context: ./web-client
       dockerfile: Dockerfile
     container_name: web-client
+    networks:
+      - mqtt_network
     volumes:
       - ./web-client/:/usr/share/nginx/html
     ports:
       - "80:80"
+    restart: always
+
+  mqtt-client:
+    build:
+      context: ./mqtt-client
+      dockerfile: Dockerfile
+    networks:
+      - mqtt_network
+    container_name: mqtt-client
     restart: always

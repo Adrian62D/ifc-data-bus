@@ -1,0 +1,6 @@
+pytest
+black
+mypy
+compas_eve>=1.0.0
+ifcopenshell>=0.8.0
+automerge==1.0.0rc1

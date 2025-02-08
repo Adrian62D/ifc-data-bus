@@ -11,7 +11,7 @@ from compas_eve.mqtt import MqttTransport
 
 def run_mqtt_example():
     """Run the MQTT example."""
-    set_default_transport(MqttTransport("localhost", 1883))
+    set_default_transport(MqttTransport("nanomq-broker", 1883))
 
     print("=== Starting MQTT Example ===")
     
