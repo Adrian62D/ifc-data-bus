@@ -1,44 +1,53 @@
 {
-    "type": "IfcRelAssociatesMaterial",
-    "globalId": "8d0fbb28-fe53-488a-a92b-a5a3c1af7a74",
-    "name": "MatAssoc",
-    "description": "Material Associates",
-    "relatedObjects": [
+    "type": "ifcJSON",
+    "version": "0.0.1",
+    "schemaIdentifier": "IFC4",
+    "data": [
         {
-            "type": "IfcWallType",
-            "ref": "909e31f1-aec1-4242-8f2c-e2425a98a449"
+            "type": "IfcMaterialLayerSet",
+            "associatedTo": [
+                {
+                    "type": "IfcRelAssociatesMaterial",
+                    "globalId": "8d0fbb28-fe53-488a-a92b-a5a3c1af7a74",
+                    "name": "MatAssoc",
+                    "description": "Material Associates",
+                    "relatedObjects": [
+                        {
+                            "type": "IfcWallType",
+                            "ref": "909e31f1-aec1-4242-8f2c-e2425a98a449"
+                        }
+                    ]
+                }
+            ],
+            "materialLayers": [
+                {
+                    "type": "IfcMaterialLayer",
+                    "material": {
+                        "type": "IfcMaterial",
+                        "name": "Masonry - Brick - Brown"
+                    },
+                    "layerThickness": 110.0,
+                    "isVentilated": false,
+                    "name": "Finish"
+                },
+                {
+                    "type": "IfcMaterialLayer",
+                    "layerThickness": 50.0,
+                    "isVentilated": true,
+                    "name": "Air Infiltration Barrier"
+                },
+                {
+                    "type": "IfcMaterialLayer",
+                    "material": {
+                        "type": "IfcMaterial",
+                        "name": "Masonry"
+                    },
+                    "layerThickness": 110.0,
+                    "isVentilated": false,
+                    "name": "Core"
+                }
+            ],
+            "layerSetName": "Double Brick - 270"
         }
-    ],
-    "relatingMaterial": {
-        "type": "IfcMaterialLayerSet",
-        "materialLayers": [
-            {
-                "type": "IfcMaterialLayer",
-                "material": {
-                    "type": "IfcMaterial",
-                    "name": "Masonry - Brick - Brown"
-                },
-                "layerThickness": 110.0,
-                "isVentilated": false,
-                "name": "Finish"
-            },
-            {
-                "type": "IfcMaterialLayer",
-                "layerThickness": 50.0,
-                "isVentilated": true,
-                "name": "Air Infiltration Barrier"
-            },
-            {
-                "type": "IfcMaterialLayer",
-                "material": {
-                    "type": "IfcMaterial",
-                    "name": "Masonry"
-                },
-                "layerThickness": 110.0,
-                "isVentilated": false,
-                "name": "Core"
-            }
-        ],
-        "layerSetName": "Double Brick - 270"
-    }
+    ]
 }

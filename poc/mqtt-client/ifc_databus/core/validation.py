@@ -39,6 +39,44 @@ class EntityRule:
 # Define validation rules for common IFC entities
 IFC_RULES: Dict[str, EntityRule] = {
     "IfcWall": EntityRule(
+        required_fields={"operation_type", "author", "timestamp", "globalId", "data"},
+        allowed_fields={
+            "operation_type", "author", "timestamp", "globalId", "data",
+            "name", "height", "width", "materialLayers", "layerSetName",
+            "thermal_resistance", "relatedObjects"
+        },
+        allowed_relationships={
+            "HasOpenings": {"IfcWindow", "IfcDoor"},
+            "connects": {"IfcWall"},
+            "bounds": {"IfcSpace"},
+            "associatedTo": {"IfcRelAssociatesMaterial"},
+        }
+    ),
+    "IfcWall_data": EntityRule(
+        required_fields={"type", "version", "schemaIdentifier", "data"},
+        allowed_fields={"type", "version", "schemaIdentifier", "data"}
+    ),
+    "IfcMaterialLayerSet": EntityRule(
+        required_fields={"type", "associatedTo", "materialLayers", "layerSetName"},
+        allowed_fields={"type", "associatedTo", "materialLayers", "layerSetName"}
+    ),
+    "IfcRelAssociatesMaterial": EntityRule(
+        required_fields={"type", "globalId", "name", "description", "relatedObjects"},
+        allowed_fields={"type", "globalId", "name", "description", "relatedObjects"}
+    ),
+    "IfcWallType": EntityRule(
+        required_fields={"type", "ref"},
+        allowed_fields={"type", "ref"}
+    ),
+    "IfcMaterialLayer": EntityRule(
+        required_fields={"type", "layerThickness", "isVentilated", "name"},
+        allowed_fields={"type", "layerThickness", "isVentilated", "name", "material"}
+    ),
+    "IfcMaterial": EntityRule(
+        required_fields={"type", "name"},
+        allowed_fields={"type", "name"}
+    ),
+    "IfcElement": EntityRule(
         required_fields={"name", "height", "width"},
         allowed_fields={"name", "height", "width", "material", "thermal_resistance"},
         allowed_relationships={

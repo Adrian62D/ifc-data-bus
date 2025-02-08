@@ -4,8 +4,7 @@ FROM nginx:alpine
 # Remove the default Nginx static assets
 RUN rm -rf /usr/share/nginx/html/*
 
-# Declare a volume for the website files so that you can bind mount your host directory
-VOLUME /usr/share/nginx/html
+COPY index.html /usr/share/nginx/html
 
 # Expose port 80 to be accessible outside the container
 EXPOSE 80
