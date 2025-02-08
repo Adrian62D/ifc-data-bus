@@ -76,7 +76,7 @@ def run_mqtt_example():
     
     # Print final state
     wall_a = bus_a._registers[wall_id]
-    print("\nFinal state:")
+    print("\nFinal state in Replica A:")
     print(f"Wall entity: {wall_a.entity_type}")
     print(f"Properties: {wall_a.data}")
     print(f"Relationships: {wall_a.relationships}")
