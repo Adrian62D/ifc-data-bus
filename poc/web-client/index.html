@@ -1,23 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <title>IFC Data Bus Client</title>
-    <!-- Include MQTT.js library from a CDN -->
+    <!-- MQTT.js Bibliothek -->
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        #messages { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; }
-        .message { margin: 5px 0; }
-    </style>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<h1>MQTT Messages</h1>
-<div id="messages"></div>
+<body class="bg-gray-100 min-h-screen p-6">
+<!-- Äußerer Container, der die volle Breite und Höhe einnimmt -->
+<div class="w-full h-full flex flex-col">
+    <h1 class="text-3xl font-bold mb-6 text-center">IFC Data Bus Client</h1>
+    <!-- Nachrichtenbereich, der den verbleibenden Platz einnimmt -->
+    <div id="messages" class="w-full bg-white rounded shadow p-4 space-y-4 flex-1 overflow-y-scroll">
+        <!-- MQTT-Nachrichten werden hier eingefügt -->
+    </div>
+</div>
+
 <script>
-    const brokerUrl = 'ws://localhost:8083/mqtt'
+    const brokerUrl = 'ws://localhost:8083/mqtt';
     const client = mqtt.connect(brokerUrl);
-    const topic = 'my/test/topic';
+    const topic = 'ifc/#';
+
     client.on('connect', () => {
         console.log('Connected to MQTT broker.');
         client.subscribe(topic, (err) => {
@@ -32,10 +37,16 @@
     client.on('message', (receivedTopic, payload) => {
         const message = payload.toString();
         console.log(`Message received on ${receivedTopic}: ${message}`);
+
+        // Erstelle ein neues Div-Element für die Nachricht
         const messagesDiv = document.getElementById('messages');
-        const messageElement = document.createElement('p');
-        messageElement.className = 'message';
-        messageElement.textContent = `Topic: ${receivedTopic} - Message: ${message}`;
+        const messageElement = document.createElement('div');
+
+        // Tailwind-Klassen für einen Alert-Effekt
+        messageElement.className = 'p-4 border-l-4 border-blue-500 bg-blue-50 text-blue-700 rounded shadow';
+
+        // Formatierte Anzeige von Topic und Message
+        messageElement.innerHTML = `<strong>Topic:</strong> ${receivedTopic}<br><strong>Message:</strong> ${message}`;
         messagesDiv.appendChild(messageElement);
     });
 
