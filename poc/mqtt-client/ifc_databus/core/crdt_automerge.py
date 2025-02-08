@@ -69,9 +69,17 @@ class IfcRegister:
     
     @classmethod
     def create(cls, entity_type: str, replica_id: str, data: Dict[str, Any]) -> "IfcRegister":
-        """Create a new IFC entity register."""
+        """Create a new IFC entity register with a random UUID."""
+        return cls.create_with_id(uuid4(), entity_type, replica_id, data)
+    
+    @classmethod
+    def create_with_id(cls, id: UUID, entity_type: str, replica_id: str, data: Dict[str, Any]) -> "IfcRegister":
+        """Create a new IFC entity register with a specific UUID.
+        
+        This is useful when you want to preserve IDs from an existing IFC file.
+        """
         register = cls(
-            id=uuid4(),
+            id=id,
             entity_type=entity_type,
             replica_id=replica_id,
         )

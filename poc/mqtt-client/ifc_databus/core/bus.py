@@ -45,14 +45,23 @@ class IfcBus:
             sub.unsubscribe()
         
     def publish_entity(self, entity_type: str, data: Dict[str, Any]) -> UUID:
-        """Publish an IFC entity."""
+        """Publish an IFC entity with a random UUID."""
+        # Generate a new UUID
+        id = uuid4()
+        return self.publish_entity_with_id(id, entity_type, data)
+    
+    def publish_entity_with_id(self, id: UUID, entity_type: str, data: Dict[str, Any]) -> UUID:
+        """Publish an IFC entity with a specific UUID.
+        
+        This is useful when you want to preserve IDs from an existing IFC file.
+        """
         # Validate entity data
         error = validate_entity(entity_type, data)
         if error:
             raise ValueError(error)
             
         # Create entity register
-        entity = IfcRegister.create(entity_type, self.replica_id, data)
+        entity = IfcRegister.create_with_id(id, entity_type, self.replica_id, data)
         self._registers[entity.id] = entity
         
         # Publish the register
