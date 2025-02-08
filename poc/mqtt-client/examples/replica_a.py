@@ -6,7 +6,7 @@ from ifc_databus.core.bus import IfcBus
 
 from compas_eve import set_default_transport
 from compas_eve.mqtt import MqttTransport
-from .config import MQTT_HOST, MQTT_PORT
+from config import MQTT_HOST, MQTT_PORT
 
 
 def run_replica_a():
