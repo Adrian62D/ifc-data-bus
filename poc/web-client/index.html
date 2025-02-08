@@ -8,6 +8,8 @@
     <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+<h1 class="mt-4 text-4xl font-extrabold tracking-tight text-slate-900">IFC Data Bus Demo</h1>
+<br />
 <body class="bg-gray-100 min-h-screen p-6">
 <div class="w-full h-full flex flex-col">
     <!-- Tab Navigation -->
@@ -22,12 +24,12 @@
 
     <div class="flex-1 overflow-y-auto">
         <div id="messagesTab">
-            <div id="messages" class="w-full bg-white rounded shadow p-4 space-y-4 h-full overflow-y-scroll">
+            <div id="messages" class="w-full bg-gray rounded shadow p-4 space-y-4 h-full overflow-y-scroll">
             </div>
         </div>
 
         <div id="publishTab" class="hidden">
-            <div class="bg-white rounded shadow p-6">
+            <div class="bg-gray rounded shadow p-6">
                 <h2 class="text-2xl font-bold mb-4">Publish Message</h2>
                 <form id="publishForm">
                     <div class="mb-4">
@@ -44,7 +46,7 @@
   "changeset_id": null
 }</textarea>
                     </div>
-                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-gray font-bold py-2 px-4 rounded">
                         Publish
                     </button>
                 </form>
@@ -77,7 +79,7 @@
         const messageElement = document.createElement('div');
         messageElement.className = 'p-4 border-l-4 border-blue-500 bg-blue-50 text-blue-700 rounded shadow';
         messageElement.innerHTML = `<strong>Topic:</strong> ${receivedTopic}<br><strong>Message:</strong> ${message}`;
-        messagesDiv.appendChild(messageElement);
+        messagesDiv.prepend(messageElement);
     });
 
     client.on('error', (err) => {
