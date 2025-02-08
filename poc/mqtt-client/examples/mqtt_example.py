@@ -30,64 +30,58 @@ def run_mqtt_example():
 
 def run_integration(bus_a, bus_b):
     # Example Object
-    wall_id = bus_a.publish_entity("IfcWall", {
-        "operation_type": "update",
-        "author": "Roman Rust",
-        "timestamp": 1689529600,
-        "globalId": "8d0fbb28-fe53-488a-a92b-a5a3c1af7a75",
-        "data": {
-                "type": "IfcMaterialLayerSet",
-                "associatedTo": [
-                    {
-                        "type": "IfcRelAssociatesMaterial",
-                        "globalId": "8d0fbb28-fe53-488a-a92b-a5a3c1af7a74",
-                        "name": "MatAssoc",
-                        "description": "Material Associates",
-                        "relatedObjects": [
-                            {
-                                "type": "IfcWallType",
-                                "ref": "909e31f1-aec1-4242-8f2c-e2425a98a449"
-                            }
-                        ]
-                    }
-                ],
-                "materialLayers": [
-                    {
-                        "type": "IfcMaterialLayer",
-                        "material": {
-                            "type": "IfcMaterial",
-                            "name": "Masonry - Brick - Brown"
-                        },
-                        "layerThickness": 110.0,
-                        "isVentilated": "false",
-                        "name": "Finish"
+    material_layerset_id = bus_a.publish_entity("IfcMaterialLayerSet", {
+            "associatedTo": [
+                {
+                    "type": "IfcRelAssociatesMaterial",
+                    "globalId": "8d0fbb28-fe53-488a-a92b-a5a3c1af7a74",
+                    "name": "MatAssoc",
+                    "description": "Material Associates",
+                    "relatedObjects": [
+                        {
+                            "type": "IfcWallType",
+                            "ref": "909e31f1-aec1-4242-8f2c-e2425a98a449"
+                        }
+                    ]
+                }
+            ],
+            "materialLayers": [
+                {
+                    "type": "IfcMaterialLayer",
+                    "material": {
+                        "type": "IfcMaterial",
+                        "name": "Masonry - Brick - Brown"
                     },
-                    {
-                        "type": "IfcMaterialLayer",
-                        "layerThickness": 50.0,
-                        "isVentilated": "true",
-                        "name": "Air Infiltration Barrier"
+                    "layerThickness": 110.0,
+                    "isVentilated": "false",
+                    "name": "Finish"
+                },
+                {
+                    "type": "IfcMaterialLayer",
+                    "layerThickness": 50.0,
+                    "isVentilated": "true",
+                    "name": "Air Infiltration Barrier"
+                },
+                {
+                    "type": "IfcMaterialLayer",
+                    "material": {
+                        "type": "IfcMaterial",
+                        "name": "Masonry"
                     },
-                    {
-                        "type": "IfcMaterialLayer",
-                        "material": {
-                            "type": "IfcMaterial",
-                            "name": "Masonry"
-                        },
-                        "layerThickness": 110.0,
-                        "isVentilated": "false",
-                        "name": "Core"
-                    }
-                ],
-                "layerSetName": "Double Brick - 270"
-            }
-    })
-    sleep(5)  # Increased delay to ensure wall is synchronized
-    wall_a = bus_a._registers[wall_id]
+                    "layerThickness": 110.0,
+                    "isVentilated": "false",
+                    "name": "Core"
+                }
+            ],
+            "layerSetName": "Double Brick - 270"
+        }
+    )
+    sleep(5)  # Increased delay to ensure object is synchronized
+    material_layerset_id = bus_a._registers[material_layerset_id]
     print("\nFinal state in Replica A:")
-    print(f"Wall entity: {wall_a.entity_type}")
-    print(f"Properties: {wall_a.data}")
-    print(f"Relationships: {wall_a.relationships}")
+    print(f"Material Layer Set entity: {material_layerset_id.entity_type}")
+    print(f"Properties: {material_layerset_id.data}")
+    print(f"Relationships: {material_layerset_id.relationships}")
 
 def run_example(bus_a, bus_b):
     # Send sync messages to ensure both replicas are connected

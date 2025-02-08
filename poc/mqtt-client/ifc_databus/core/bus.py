@@ -5,6 +5,7 @@ import json
 import base64
 from datetime import datetime
 from pathlib import Path
+import getpass
 
 from compas_eve import Publisher, Subscriber, Topic, Message
 from .message_automerge import IfcMessage
@@ -65,7 +66,7 @@ class IfcBus:
         self._registers[entity.id] = entity
         
         # Publish the register
-        self._publish_message(entity)
+        self._publish_message("create", entity)
         
         return entity.id
     
@@ -84,7 +85,7 @@ class IfcBus:
         entity.update(data)
         
         # Publish the register
-        self._publish_message(entity)
+        self._publish_message("update", entity)
     
     def add_relationship(self, source_id: UUID, rel_type: str, target_id: UUID, rel_data: Dict[str, Any] = None):
         """Add a relationship between entities."""
@@ -104,9 +105,9 @@ class IfcBus:
         source.add_relationship(rel_type, target_id, rel_data)
         
         # Publish the register
-        self._publish_message(source)
+        self._publish_message("add_relationship", source)
     
-    def _publish_message(self, register: IfcRegister):
+    def _publish_message(self, operation_type: str, register: IfcRegister):
         """Publish an IFC register."""
         # Get topic for this entity type
         topic_name = f"ifc/{register.entity_type}"
@@ -120,6 +121,9 @@ class IfcBus:
         
         # Convert register to dict for MQTT
         msg_dict = {
+            "operation_type": operation_type,
+            "operation_id": str(uuid4()),
+            "author": getpass.getuser(),
             "id": str(register.id),
             "entity_type": register.entity_type,
             "replica_id": self.replica_id,  # Use our replica ID
@@ -135,14 +139,8 @@ class IfcBus:
         print(f"Published message to {topic_name} with data: {register.data}")
         
         # Log the message
-        log_entry = {
-            "timestamp": datetime.now().isoformat(),
-            "topic": topic_name,
-            "replica_id": self.replica_id,
-            "message": msg_dict
-        }
         with open(self.log_file, "a") as f:
-            f.write(json.dumps(log_entry) + "\n")
+            f.write(json.dumps(msg_dict) + "\n")
         
     def _handle_message(self, message: Message):
         """Handle incoming messages."""
@@ -179,7 +177,7 @@ class IfcBus:
                 # Re-broadcast if data changed
                 if current_register.data != old_data:
                     print(f"Re-broadcasting changes for {msg_id}")
-                    self._publish_message(current_register)
+                    self._publish_message("broadcast", current_register)
         except Exception as e:
             print(f"Error handling message: {e}")
         

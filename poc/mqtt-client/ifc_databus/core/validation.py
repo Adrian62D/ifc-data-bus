@@ -41,7 +41,7 @@ IFC_RULES: Dict[str, EntityRule] = {
     "IfcWall": EntityRule(
         required_fields={},
         allowed_fields={
-            "operation_type", "author", "timestamp", "globalId", "data",
+            "globalId", "data",
             "name", "height", "width", "materialLayers", "layerSetName",
             "thermal_resistance", "relatedObjects", "material"
         },
@@ -57,8 +57,8 @@ IFC_RULES: Dict[str, EntityRule] = {
         allowed_fields={"type", "version", "schemaIdentifier", "data"}
     ),
     "IfcMaterialLayerSet": EntityRule(
-        required_fields={"type", "associatedTo", "materialLayers", "layerSetName"},
-        allowed_fields={"type", "associatedTo", "materialLayers", "layerSetName"}
+        required_fields={"associatedTo", "materialLayers", "layerSetName"},
+        allowed_fields={"associatedTo", "materialLayers", "layerSetName"}
     ),
     "IfcRelAssociatesMaterial": EntityRule(
         required_fields={"type", "globalId", "name", "description", "relatedObjects"},

@@ -10,7 +10,7 @@ from compas_eve.mqtt import MqttTransport
 
 def run_replica_a():
     """Run Replica A."""
-    set_default_transport(MqttTransport("localhost", 1883))
+    set_default_transport(MqttTransport("nanomq-broker", 1883))
 
     print("=== Starting Replica A ===")
     
@@ -30,7 +30,7 @@ def run_replica_a():
     sleep(3)  # Wait for sync
     
     # Create a wall
-    wall_id = "c231300d-58f7-4c82-ade7-cb328725f0d9"
+    wall_id = UUID("c231300d-58f7-4c82-ade7-cb328725f0d9")
     wall_id = bus_a.publish_entity_with_id(wall_id, "IfcWall", {
         "name": "Wall1",
         "height": 3.0,

@@ -10,7 +10,7 @@ from compas_eve.mqtt import MqttTransport
 
 def run_replica_b():
     """Run Replica B."""
-    set_default_transport(MqttTransport("localhost", 1883))
+    set_default_transport(MqttTransport("nanomq-broker", 1883))
 
     print("=== Starting Replica B ===")
     
