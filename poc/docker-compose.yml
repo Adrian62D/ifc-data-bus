@@ -8,3 +8,13 @@ services:
       - "1883:1883"   # MQTT port
       - "8083:8083"   # WebSockets
     restart: always
+  web-client:
+    build:
+      context: ./web-client
+      dockerfile: Dockerfile
+    container_name: web-client
+    volumes:
+      - ./web-client/:/usr/share/nginx/html
+    ports:
+      - "80:80"
+    restart: always
