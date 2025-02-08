@@ -26,8 +26,6 @@ services:
     container_name: web-client
     networks:
       - mqtt_network
-    volumes:
-      - ./web-client/:/usr/share/nginx/html
     ports:
       - "80:80"
     restart: always
