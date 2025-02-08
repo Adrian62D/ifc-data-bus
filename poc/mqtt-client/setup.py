@@ -7,7 +7,7 @@ setup(
     install_requires=[
         "compas_eve",
         "paho-mqtt",
-        "automerge"
+        "automerge==1.0.0rc1",
     ],
     author="Your Name",
     author_email="your.email@example.com",
