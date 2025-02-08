@@ -1,0 +1,6 @@
+Build/*
+.DS_Store
+.vscode
+out/*
+CMakeUserPresets.json
+APIDevKit-*/
