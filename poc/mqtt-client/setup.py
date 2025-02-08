@@ -5,9 +5,9 @@ setup(
     version="0.1.0",
     packages=find_packages(),
     install_requires=[
-        "compas_eve",
+        "compas_eve>=1.0.0",
         "paho-mqtt",
-        "automerge"
+        "automerge==1.0.0rc1",
     ],
     author="Your Name",
     author_email="your.email@example.com",
