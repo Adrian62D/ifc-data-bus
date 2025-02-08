@@ -160,8 +160,43 @@ class IfcRegister:
         # Merge the documents
         self.doc.merge(other.doc)
         
-        # Update timestamp to be the max of both timestamps
+        # Merge all fields from both documents
+        merged_data = {**self.data, **other.data}
+        merged_rels = {**self.relationships, **other.relationships}
+        
+        # Update the merged data
         with self.doc.transaction() as tx:
+            # Update all data fields
+            for key, value in merged_data.items():
+                if isinstance(value, (int, float)):
+                    scalar_type = ScalarType.F64
+                elif isinstance(value, bool):
+                    scalar_type = ScalarType.Boolean
+                else:
+                    scalar_type = ScalarType.Str
+                    value = str(value)
+                tx.put(self._data, key, scalar_type, value)
+            
+            # Update all relationships
+            for rel_type, targets in merged_rels.items():
+                for target_id, rel_data in targets.items():
+                    if rel_type not in self.doc.keys(self._rels):
+                        rel_map = tx.put_object(self._rels, rel_type, ObjType.Map)
+                    else:
+                        rel_map_obj = self.doc.get(self._rels, rel_type)
+                        rel_map = rel_map_obj[1] if isinstance(rel_map_obj, tuple) else rel_map_obj
+                    
+                    target_map = tx.put_object(rel_map, target_id, ObjType.Map)
+                    for key, value in rel_data.items():
+                        if isinstance(value, (int, float)):
+                            scalar_type = ScalarType.F64
+                        elif isinstance(value, bool):
+                            scalar_type = ScalarType.Boolean
+                        else:
+                            scalar_type = ScalarType.Str
+                        tx.put(target_map, key, scalar_type, value)
+            
+            # Update timestamp to be the max of both timestamps
             tx.put(ROOT, "timestamp", ScalarType.F64, max(self.timestamp, other.timestamp))
     
     def to_binary(self) -> bytes:
