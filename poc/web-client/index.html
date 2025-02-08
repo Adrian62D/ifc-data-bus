@@ -57,7 +57,7 @@
 </div>
 
 <script>
-    const brokerUrl = 'ws://localhost:8083/mqtt';
+    const brokerUrl = 'ws://' + window.location.hostname + ':8083/mqtt';
     const client = mqtt.connect(brokerUrl);
 
     client.on('connect', () => {
