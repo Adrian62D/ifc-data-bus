@@ -1,0 +1,15 @@
+name: ifc-databus
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - pip
+  - pytest
+  - black
+  - mypy
+  - rust
+  - pip:
+    - compas_eve>=1.0.0
+    - ifcopenshell>=0.7.0
+    - automerge==1.0.0rc1
