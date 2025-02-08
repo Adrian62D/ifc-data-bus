@@ -37,11 +37,29 @@ mamba activate ifc-databus
 python setup.py build install
 ```
 
-4. run some examples
+4. Configure environment variables:
+```bash
+# Copy the example environment file
+cp .env.example .env
+
+# Edit .env with your settings
+vim .env  # or use any text editor
+```
+
+5. Run examples:
 ```bash
 cd examples
-python mqtt_example.py 
+python mqtt_example.py
 ```
+
+### Environment Variables
+
+The following environment variables can be configured in your `.env` file:
+
+- `MQTT_HOST`: MQTT broker hostname (default: "localhost")
+- `MQTT_PORT`: MQTT broker port (default: 1883)
+
+For Docker environments, these are automatically set in the docker-compose.yml file.
 
 ## Development
 

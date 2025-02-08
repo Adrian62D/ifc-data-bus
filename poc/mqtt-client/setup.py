@@ -8,6 +8,8 @@ setup(
         "compas_eve>=1.0.0",
         "paho-mqtt",
         "automerge==1.0.0rc1",
+        "python-dotenv>=1.0.0",
+        "ifcopenshell>=0.8.0",
     ],
     author="Your Name",
     author_email="your.email@example.com",

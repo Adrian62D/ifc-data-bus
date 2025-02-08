@@ -34,7 +34,12 @@ services:
     build:
       context: ./mqtt-client
       dockerfile: Dockerfile
+    container_name: mqtt-client
     networks:
       - mqtt_network
-    container_name: mqtt-client
+    environment:
+      - MQTT_HOST=nanomq-broker
+      - MQTT_PORT=1883
+    depends_on:
+      - nanomq
     restart: always

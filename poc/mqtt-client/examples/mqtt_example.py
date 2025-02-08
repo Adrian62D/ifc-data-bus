@@ -7,10 +7,11 @@ from ifc_databus.core.bus import IfcBus
 
 from compas_eve import set_default_transport
 from compas_eve.mqtt import MqttTransport
+from .config import MQTT_HOST, MQTT_PORT
 
 def run_mqtt_example():
     """Run the MQTT example."""
-    set_default_transport(MqttTransport("nanomq-broker", 1883))
+    set_default_transport(MqttTransport(MQTT_HOST, MQTT_PORT))
 
     print("=== Starting MQTT Example ===")
     # Create two bus instances
