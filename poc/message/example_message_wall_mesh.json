@@ -1,0 +1,158 @@
+{
+    "type": "ifcJSON",
+    "version": "0.0.1",
+    "schemaIdentifier": "IFC4",
+    "data": [
+        {
+            "type": "IfcMaterial",
+            "globalId": "mat_brick_brown",
+            "name": "Masonry - Brick - Brown"
+        },
+        {
+            "type": "IfcPropertySet",
+            "globalId": "prop_set_1",
+            "name": "CustomProperties",
+            "description": "Custom properties for Masonry - Brick - Brown",
+            "hasProperties": [
+                {
+                    "type": "IfcPropertySingleValue",
+                    "name": "Manufacturer",
+                    "description": "Name of the material manufacturer",
+                    "nominalValue": {
+                        "type": "IfcText",
+                        "value": "ABC Bricks Inc."
+                    }
+                },
+                {
+                    "type": "IfcPropertySingleValue",
+                    "name": "Color",
+                    "description": "Color of the material",
+                    "nominalValue": {
+                        "type": "IfcText",
+                        "value": "Brown"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "IfcRelAssociates",
+            "globalId": "rel_assoc_1",
+            "relatedObjects": [
+                {
+                    "ref": "mat_brick_brown"
+                }
+            ],
+            "relatingPropertyDefinition": {
+                "ref": "prop_set_1"
+            }
+        },
+        {
+            "type": "IfcWall",
+            "globalId": "909e31f1-aec1-4242-8f2c-e2425a98a449",
+            "name": "Exterior Wall",
+            "description": "A double brick wall with air infiltration barrier",
+            "objectPlacement": {
+                "type": "IfcLocalPlacement",
+                "placementRelTo": {
+                    "ref": "world_coordinate_system"
+                },
+                "relativePlacement": {
+                    "type": "IfcAxis2Placement3D",
+                    "location": {
+                        "type": "IfcCartesianPoint",
+                        "coordinates": [0.0, 0.0, 0.0]
+                    },
+                    "axis": {
+                        "type": "IfcDirection",
+                        "directionRatios": [0.0, 0.0, 1.0]
+                    },
+                    "refDirection": {
+                        "type": "IfcDirection",
+                        "directionRatios": [1.0, 0.0, 0.0]
+                    }
+                }
+            },
+            "representation": {
+                "type": "IfcProductDefinitionShape",
+                "representations": [
+                    {
+                        "type": "IfcShapeRepresentation",
+                        "representationIdentifier": "Body",
+                        "representationType": "Tessellation",
+                        "items": [
+                            {
+                                "type": "IfcTriangulatedFaceSet",
+                                "coordinates": {
+                                    "type": "IfcCartesianPointList3D",
+                                    "coordList": [
+                                        [0.0, 0.0, 0.0],
+                                        [5000.0, 0.0, 0.0],
+                                        [5000.0, 270.0, 0.0],
+                                        [0.0, 270.0, 0.0],
+                                        [0.0, 0.0, 3000.0],
+                                        [5000.0, 0.0, 3000.0],
+                                        [5000.0, 270.0, 3000.0],
+                                        [0.0, 270.0, 3000.0]
+                                    ]
+                                },
+                                "closed": true,
+                                "PnIndex": null,
+                                "coordIndex": [
+                                    [0, 1, 2],
+                                    [0, 2, 3],
+                                    [4, 5, 6],
+                                    [4, 6, 7],
+                                    [0, 1, 5],
+                                    [0, 5, 4],
+                                    [2, 3, 7],
+                                    [2, 7, 6],
+                                    [1, 2, 6],
+                                    [1, 6, 5],
+                                    [0, 3, 7],
+                                    [0, 7, 4]
+                                ] 
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "type": "IfcRelAssociatesMaterial",
+            "globalId": "rel_assoc_material_1",
+            "relatedObjects": [
+                {
+                    "ref": "909e31f1-aec1-4242-8f2c-e2425a98a449"
+                }
+            ],
+            "relatingMaterial": {
+                "ref": "mat_brick_brown"
+            }
+        },
+        {
+            "type": "IfcClassificationReference",
+            "globalId": "classification_ref_1",
+            "identification": "C02.01",
+            "name": "External Walls",
+            "referencedSource": {
+                "type": "IfcClassification",
+                "globalId": "classification_1",
+                "name": "eBKB-H",
+                "description": "Baukonstenplan Hochbau eBKB-H"
+            }
+        },
+        {
+            "type": "IfcRelAssociatesClassification",
+            "globalId": "rel_assoc_classification_1",
+            "relatedObjects": [
+                {
+                    "ref": "909e31f1-aec1-4242-8f2c-e2425a98a449"
+                }
+            ],
+            "relatingClassification": {
+                "ref": "classification_ref_1"
+            }
+        }
+    ]
+}
+
