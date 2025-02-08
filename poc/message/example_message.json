@@ -24,7 +24,8 @@
                     "type": "IfcMaterialLayer",
                     "material": {
                         "type": "IfcMaterial",
-                        "name": "Masonry - Brick - Brown"
+                        "name": "Masonry - Brick - Brown",
+                        "globalId": "mat_brick_brown"
                     },
                     "layerThickness": 110.0,
                     "isVentilated": false,
@@ -48,6 +49,44 @@
                 }
             ],
             "layerSetName": "Double Brick - 270"
+        },
+        {
+            "type": "IfcPropertySet",
+            "globalId": "prop_set_1",
+            "name": "CustomProperties",
+            "description": "Custom properties for Masonry - Brick - Brown",
+            "hasProperties": [
+                {
+                    "type": "IfcPropertySingleValue",
+                    "name": "ThermalConductivity",
+                    "description": "Thermal conductivity of the material",
+                    "nominalValue": {
+                        "type": "IfcThermalConductivityMeasure",
+                        "value": 0.6
+                    }
+                },
+                {
+                    "type": "IfcPropertySingleValue",
+                    "name": "Density",
+                    "description": "Density of the material",
+                    "nominalValue": {
+                        "type": "IfcMassDensityMeasure",
+                        "value": 1800
+                    }
+                }
+            ]
+        },
+        {
+            "type": "IfcRelAssociates",
+            "globalId": "rel_assoc_1",
+            "relatedObjects": [
+                {
+                    "ref": "mat_brick_brown"
+                }
+            ],
+            "relatingPropertyDefinition": {
+                "ref": "prop_set_1"
+            }
         }
     ]
 }
