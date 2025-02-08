@@ -2,7 +2,6 @@
 from dataclasses import dataclass
 from typing import Any, Dict, Optional
 from uuid import UUID
-import base64
 from .crdt_automerge import IfcRegister
 
 
