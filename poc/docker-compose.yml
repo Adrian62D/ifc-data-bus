@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  nanomq:
+    image: emqx/nanomq:0.18.2-full
+    container_name: nanomq-broker
+    ports:
+      - "1883:1883"   # MQTT port
+      - "8083:8083"   # WebSockets
+    restart: always
