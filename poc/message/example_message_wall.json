@@ -143,6 +143,30 @@
             "relatingMaterial": {
                 "ref": "mat_brick_brown"
             }
+        },
+        {
+            "type": "IfcClassificationReference",
+            "globalId": "classification_ref_1",
+            "identification": "C02.01",
+            "name": "External Walls",
+            "referencedSource": {
+                "type": "IfcClassification",
+                "globalId": "classification_1",
+                "name": "eBKB-H",
+                "description": "Baukonstenplan Hochbau eBKB-H"
+            }
+        },
+        {
+            "type": "IfcRelAssociatesClassification",
+            "globalId": "rel_assoc_classification_1",
+            "relatedObjects": [
+                {
+                    "ref": "909e31f1-aec1-4242-8f2c-e2425a98a449"
+                }
+            ],
+            "relatingClassification": {
+                "ref": "classification_ref_1"
+            }
         }
     ]
 }
