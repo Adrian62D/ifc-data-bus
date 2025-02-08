@@ -18,6 +18,8 @@ This project uses `conda/mamba` for environment management. To get started:
 0. Install Mamba:
 ```bash
 brew install --cask mambaforge
+mamba init
+source ~/.bashrc
 ```
 
 1. Create the environment:
