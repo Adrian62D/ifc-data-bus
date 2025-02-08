@@ -1,6 +1,6 @@
 """Core bus implementation using MQTT."""
 from typing import Any, Callable, Dict, Optional
-from uuid import UUID
+from uuid import UUID, uuid4
 import json
 import base64
 from datetime import datetime
