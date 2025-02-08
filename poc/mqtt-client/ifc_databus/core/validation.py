@@ -10,17 +10,18 @@ class EntityRule:
     allowed_fields: Set[str] = field(default_factory=set)
     allowed_relationships: Dict[str, Set[str]] = field(default_factory=dict)  # rel_type -> target_entity_types
     
+    def __post_init__(self):
+        """Add common fields that are allowed in all entities."""
+        self.allowed_fields.add("type")
+        self.allowed_fields.add("globalId")
+        self.allowed_fields.add("description")
+    
     def validate_data(self, data: Dict[str, Any]) -> Optional[str]:
         """Validate entity data against rules."""
-        # Check required fields
+        # Only check required fields
         for field in self.required_fields:
             if field not in data:
                 return f"Missing required field: {field}"
-        
-        # Check field types and values (can be extended)
-        for field, value in data.items():
-            if field not in self.allowed_fields and field not in self.required_fields:
-                return f"Unknown field: {field}"
         
         return None
     
@@ -38,12 +39,70 @@ class EntityRule:
 
 # Define validation rules for common IFC entities
 IFC_RULES: Dict[str, EntityRule] = {
+    # Mesh-related entities
+    "IfcTriangulatedFaceSet": EntityRule(
+        required_fields={"coordinates", "coordIndex"},
+        allowed_fields={"type", "coordinates", "coordIndex", "closed", "PnIndex"}
+    ),
+    "IfcCartesianPointList3D": EntityRule(
+        required_fields={"coordList"},
+        allowed_fields={"type", "coordList"}
+    ),
+    "IfcShapeRepresentation": EntityRule(
+        required_fields={"representationIdentifier", "representationType", "items"},
+        allowed_fields={"type", "representationIdentifier", "representationType", "items"}
+    ),
+    "IfcProductDefinitionShape": EntityRule(
+        required_fields={"representations"},
+        allowed_fields={"type", "representations"}
+    ),
+    "IfcLocalPlacement": EntityRule(
+        required_fields={"relativePlacement"},
+        allowed_fields={"type", "placementRelTo", "relativePlacement"}
+    ),
+    "IfcAxis2Placement3D": EntityRule(
+        required_fields={"location"},
+        allowed_fields={"type", "location", "axis", "refDirection"}
+    ),
+    "IfcCartesianPoint": EntityRule(
+        required_fields={"coordinates"},
+        allowed_fields={"type", "coordinates"}
+    ),
+    "IfcDirection": EntityRule(
+        required_fields={"directionRatios"},
+        allowed_fields={"type", "directionRatios"}
+    ),
+    "IfcPropertySet": EntityRule(
+        required_fields={"name", "hasProperties"},
+        allowed_fields={"type", "globalId", "name", "description", "hasProperties"}
+    ),
+    "IfcPropertySingleValue": EntityRule(
+        required_fields={"name", "nominalValue"},
+        allowed_fields={"type", "name", "description", "nominalValue"}
+    ),
+    "IfcText": EntityRule(
+        required_fields={"value"},
+        allowed_fields={"type", "value"}
+    ),
+    "IfcRelAssociates": EntityRule(
+        required_fields={"relatedObjects", "relatingPropertyDefinition"},
+        allowed_fields={"type", "globalId", "name", "relatedObjects", "relatingPropertyDefinition"}
+    ),
+    "IfcClassificationReference": EntityRule(
+        required_fields={"identification", "name"},
+        allowed_fields={"type", "globalId", "identification", "name", "description", "location"}
+    ),
+    "IfcRelAssociatesClassification": EntityRule(
+        required_fields={"type", "relatedObjects"},
+        allowed_fields={"type", "globalId", "name", "description", "relatedObjects", "relatingClassification"}
+    ),
     "IfcWall": EntityRule(
         required_fields={},
         allowed_fields={
             "globalId", "data",
             "name", "height", "width", "materialLayers", "layerSetName",
-            "thermal_resistance", "relatedObjects", "material"
+            "thermal_resistance", "relatedObjects", "material",
+            "objectPlacement", "representation"
         },
         allowed_relationships={
             "HasOpenings": {"IfcWindow", "IfcDoor"},
@@ -61,8 +120,8 @@ IFC_RULES: Dict[str, EntityRule] = {
         allowed_fields={"associatedTo", "materialLayers", "layerSetName"}
     ),
     "IfcRelAssociatesMaterial": EntityRule(
-        required_fields={"type", "globalId", "name", "description", "relatedObjects"},
-        allowed_fields={"type", "globalId", "name", "description", "relatedObjects"}
+        required_fields={"type", "relatedObjects"},
+        allowed_fields={"type", "globalId", "name", "description", "relatedObjects", "relatingMaterial"}
     ),
     "IfcWallType": EntityRule(
         required_fields={"type", "ref"},

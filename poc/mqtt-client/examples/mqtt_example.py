@@ -1,5 +1,6 @@
 """Example demonstrating MQTT-based communication between IFC entities."""
 
+import time
 from time import sleep
 from uuid import uuid4
 from ifc_databus.core.bus import IfcBus
@@ -83,6 +84,15 @@ def run_integration(bus_a, bus_b):
     print(f"Properties: {material_layerset_id.data}")
     print(f"Relationships: {material_layerset_id.relationships}")
 
+def wait_for_entity(bus, entity_id, timeout=10, interval=0.1):
+    """Wait for an entity to exist in a bus replica."""
+    start_time = time.time()
+    while time.time() - start_time < timeout:
+        if bus.has_entity(entity_id):
+            return True
+        sleep(interval)
+    return False
+
 def run_example(bus_a, bus_b):
     # Send sync messages to ensure both replicas are connected
     bus_a.publish_entity("IfcWall", {
@@ -104,7 +114,10 @@ def run_example(bus_a, bus_b):
         "width": 2.0,
         "material": "Concrete",
     })
-    sleep(5)  # Increased delay to ensure wall is synchronized
+    
+    # Wait for wall to be synchronized to replica B
+    if not wait_for_entity(bus_b, wall_id):
+        raise TimeoutError("Timeout waiting for wall to sync to replica B")
 
     # Create a window in replica B
     window_id = bus_b.publish_entity("IfcWindow", {
@@ -113,6 +126,10 @@ def run_example(bus_a, bus_b):
         "width": 0.8,
         "material": "Glass",
     })
+    
+    # Wait for window to be synchronized
+    if not wait_for_entity(bus_b, window_id):
+        raise TimeoutError("Timeout waiting for window to sync")
 
     # Add relationship between wall and window
     bus_b.add_relationship(

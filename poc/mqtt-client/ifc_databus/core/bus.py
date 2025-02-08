@@ -45,6 +45,10 @@ class IfcBus:
         for sub in self._subscribers.values():
             sub.unsubscribe()
         
+    def has_entity(self, entity_id: UUID) -> bool:
+        """Check if an entity exists in this replica."""
+        return entity_id in self._registers
+    
     def publish_entity(self, entity_type: str, data: Dict[str, Any]) -> UUID:
         """Publish an IFC entity with a random UUID."""
         # Generate a new UUID
