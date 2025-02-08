@@ -15,6 +15,11 @@ A data bus implementation for IFC data using publisher/subscriber communication 
 
 This project uses `conda/mamba` for environment management. To get started:
 
+0. Install Mamba:
+```bash
+brew install --cask mambaforge
+```
+
 1. Create the environment:
 ```bash
 mamba env create -f environment.yml
