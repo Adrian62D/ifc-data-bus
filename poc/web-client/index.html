@@ -9,27 +9,62 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen p-6">
-<!-- Äußerer Container, der die volle Breite und Höhe einnimmt -->
 <div class="w-full h-full flex flex-col">
-    <h1 class="text-3xl font-bold mb-6 text-center">IFC Data Bus Client</h1>
-    <!-- Nachrichtenbereich, der den verbleibenden Platz einnimmt -->
-    <div id="messages" class="w-full bg-white rounded shadow p-4 space-y-4 flex-1 overflow-y-scroll">
-        <!-- MQTT-Nachrichten werden hier eingefügt -->
+    <!-- Tab Navigation -->
+    <div class="flex border-b border-gray-300 mb-4">
+        <button id="tab-messages" class="py-2 px-4 text-blue-500 border-b-2 border-blue-500 focus:outline-none">
+            Messages
+        </button>
+        <button id="tab-publish" class="py-2 px-4 text-gray-500 hover:text-blue-500 focus:outline-none">
+            Publish
+        </button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto">
+        <div id="messagesTab">
+            <div id="messages" class="w-full bg-white rounded shadow p-4 space-y-4 h-full overflow-y-scroll">
+            </div>
+        </div>
+
+        <div id="publishTab" class="hidden">
+            <div class="bg-white rounded shadow p-6">
+                <h2 class="text-2xl font-bold mb-4">Publish Message</h2>
+                <form id="publishForm">
+                    <div class="mb-4">
+                        <label for="jsonInput" class="block text-gray-700 font-bold mb-2">
+                            JSON Message
+                        </label>
+                        <textarea id="jsonInput" class="w-full p-2 border border-gray-300 rounded" rows="10">{
+  "id": "e36f6e87-9990-499d-ab5b-01e6edf9e30a",
+  "entity_type": "IfcWall",
+  "crdt_data": "hW9Kg7DtzvYAmgIBENNTgN5j203JguKISy/kCiQB3MwUw3wuzfgHb0rs+hXu+5V0kQjwYy+t3f6G+NWAYqEHAQIDAhMDIwJAA0MCVgIKAQQCBBVQIQIjCzQBQgZWD1c0gAECAgACAX4FBAIAfgABfwACBwAFBAAABQQBdwRkYXRhC2VudGl0eV90eXBlDXJlbGF0aW9uc2hpcHMKcmVwbGljYV9pZAl0aW1lc3RhbXAGaGVpZ2h0CG1hdGVyaWFsBG5hbWUFd2lkdGgJAHsBAn8CAQICfn0CCX0AAQAGAXwAdgCGAQKFAX2GAVaFAUlmY1dhbGxyZXBsaWNhMdzZ/fPZ6dlBAAAAAAAACEBDb25jcmV0ZVdhbGwxAAAAAAAAAEAJAAE=",
+  "replica_id": "replica1",
+  "timestamp": 1739024335.966422,
+  "parent_id": null,
+  "changeset_id": null
+}</textarea>
+                    </div>
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Publish
+                    </button>
+                </form>
+                <div id="publishStatus" class="mt-4"></div>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
     const brokerUrl = 'ws://localhost:8083/mqtt';
     const client = mqtt.connect(brokerUrl);
-    const topic = 'ifc/#';
 
     client.on('connect', () => {
         console.log('Connected to MQTT broker.');
-        client.subscribe(topic, (err) => {
+        client.subscribe('ifc/#', (err) => {
             if (err) {
                 console.error('Subscription error:', err);
             } else {
-                console.log(`Subscribed to topic: ${topic}`);
+                console.log('Subscribed to topic: ifc/#');
             }
         });
     });
@@ -38,14 +73,9 @@
         const message = payload.toString();
         console.log(`Message received on ${receivedTopic}: ${message}`);
 
-        // Erstelle ein neues Div-Element für die Nachricht
         const messagesDiv = document.getElementById('messages');
         const messageElement = document.createElement('div');
-
-        // Tailwind-Klassen für einen Alert-Effekt
         messageElement.className = 'p-4 border-l-4 border-blue-500 bg-blue-50 text-blue-700 rounded shadow';
-
-        // Formatierte Anzeige von Topic und Message
         messageElement.innerHTML = `<strong>Topic:</strong> ${receivedTopic}<br><strong>Message:</strong> ${message}`;
         messagesDiv.appendChild(messageElement);
     });
@@ -53,6 +83,47 @@
     client.on('error', (err) => {
         console.error('Connection error: ', err);
         client.end();
+    });
+
+    const tabMessages = document.getElementById('tab-messages');
+    const tabPublish = document.getElementById('tab-publish');
+    const messagesTab = document.getElementById('messagesTab');
+    const publishTab = document.getElementById('publishTab');
+
+    tabMessages.addEventListener('click', () => {
+        tabMessages.classList.add('text-blue-500', 'border-b-2', 'border-blue-500');
+        tabPublish.classList.remove('text-blue-500', 'border-b-2', 'border-blue-500');
+        messagesTab.classList.remove('hidden');
+        publishTab.classList.add('hidden');
+    });
+
+    tabPublish.addEventListener('click', () => {
+        tabPublish.classList.add('text-blue-500', 'border-b-2', 'border-blue-500');
+        tabMessages.classList.remove('text-blue-500', 'border-b-2', 'border-blue-500');
+        publishTab.classList.remove('hidden');
+        messagesTab.classList.add('hidden');
+    });
+
+    const publishForm = document.getElementById('publishForm');
+    const publishStatus = document.getElementById('publishStatus');
+    publishForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        let jsonData = document.getElementById('jsonInput').value;
+        try {
+            JSON.parse(jsonData);
+            client.publish('ifc/test', jsonData, (err) => {
+                if (err) {
+                    publishStatus.textContent = 'Publish failed: ' + err.message;
+                    publishStatus.className = 'mt-4 text-red-600';
+                } else {
+                    publishStatus.textContent = 'Message published successfully!';
+                    publishStatus.className = 'mt-4 text-green-600';
+                }
+            });
+        } catch (err) {
+            publishStatus.textContent = 'Invalid JSON: ' + err.message;
+            publishStatus.className = 'mt-4 text-red-600';
+        }
     });
 </script>
 </body>
