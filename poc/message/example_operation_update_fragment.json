@@ -1,0 +1,32 @@
+{
+    "operation_type": "update",
+    "operation_id": "8d0fbb28-fe53-488a-a92b-a5a3c1af7a75",
+    "author": "Roman Rust",
+    "timestamp": 1689529600,
+    "payload": {
+        "type": "IfcPropertySet",
+        "globalId": "prop_set_1",
+        "name": "CustomProperties",
+        "description": "Custom properties for Masonry - Brick - Brown",
+        "hasProperties": [
+            {
+                "type": "IfcPropertySingleValue",
+                "name": "ThermalConductivity",
+                "description": "Thermal conductivity of the material",
+                "nominalValue": {
+                    "type": "IfcThermalConductivityMeasure",
+                    "value": 0.6
+                }
+            },
+            {
+                "type": "IfcPropertySingleValue",
+                "name": "Density",
+                "description": "Density of the material",
+                "nominalValue": {
+                    "type": "IfcMassDensityMeasure",
+                    "value": 1800
+                }
+            }
+        ]
+    }
+}
