@@ -119,6 +119,8 @@ class IfcBus:
             "relationships": register.relationships,
             "crdt_data": base64.b64encode(register.to_binary()).decode('utf-8'),  # Include CRDT data
         }
+
+        # Publish message
         msg = Message(msg_dict)
         self._publishers[topic_name].publish(msg)
         print(f"Published message to {topic_name} with data: {register.data}")
