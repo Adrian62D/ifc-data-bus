@@ -39,11 +39,11 @@ class EntityRule:
 # Define validation rules for common IFC entities
 IFC_RULES: Dict[str, EntityRule] = {
     "IfcWall": EntityRule(
-        required_fields={"operation_type", "author", "timestamp", "globalId", "data"},
+        required_fields={},
         allowed_fields={
             "operation_type", "author", "timestamp", "globalId", "data",
             "name", "height", "width", "materialLayers", "layerSetName",
-            "thermal_resistance", "relatedObjects"
+            "thermal_resistance", "relatedObjects", "material"
         },
         allowed_relationships={
             "HasOpenings": {"IfcWindow", "IfcDoor"},
@@ -75,15 +75,6 @@ IFC_RULES: Dict[str, EntityRule] = {
     "IfcMaterial": EntityRule(
         required_fields={"type", "name"},
         allowed_fields={"type", "name"}
-    ),
-    "IfcElement": EntityRule(
-        required_fields={"name", "height", "width"},
-        allowed_fields={"name", "height", "width", "material", "thermal_resistance"},
-        allowed_relationships={
-            "HasOpenings": {"IfcWindow", "IfcDoor"},
-            "connects": {"IfcWall"},
-            "bounds": {"IfcSpace"}
-        }
     ),
     "IfcWindow": EntityRule(
         required_fields={"name", "height", "width"},

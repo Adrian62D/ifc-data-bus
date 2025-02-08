@@ -91,7 +91,7 @@ def run_integration(bus_a, bus_b):
 
 def run_example(bus_a, bus_b):
     # Send sync messages to ensure both replicas are connected
-    bus_a.publish_entity("IfcElement", {
+    bus_a.publish_entity("IfcWall", {
         "name": "SyncWall",
         "height": 1.0,
         "width": 1.0,
@@ -104,7 +104,7 @@ def run_example(bus_a, bus_b):
     sleep(3)  # Increased delay to ensure sync
 
     # Create a wall in replica A
-    wall_id = bus_a.publish_entity("IfcElement", {
+    wall_id = bus_a.publish_entity("IfcWall", {
         "name": "Wall1",
         "height": 3.0,
         "width": 2.0,
