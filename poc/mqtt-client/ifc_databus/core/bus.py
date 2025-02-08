@@ -2,6 +2,7 @@
 from typing import Any, Callable, Dict, Optional
 from uuid import UUID
 import json
+import base64
 from datetime import datetime
 from pathlib import Path
 
@@ -26,10 +27,8 @@ class IfcBus:
         self.log_dir.mkdir(exist_ok=True)
         self.log_file = self.log_dir / f"mqtt_messages_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
         
-        # Subscribe to all IFC topics
-        self.subscribe_to_entity("IfcWall", self._handle_message)
-        self.subscribe_to_entity("IfcWindow", self._handle_message)
-        self.subscribe_to_entity("IfcDoor", self._handle_message)
+        # Subscribe to all IFC topics once
+        self._subscribe_to_all_entities()
         
     def connect(self):
         """Connect to the message bus."""
@@ -56,9 +55,8 @@ class IfcBus:
         entity = IfcRegister.create(entity_type, self.replica_id, data)
         self._registers[entity.id] = entity
         
-        # Create and publish message
-        message = IfcMessage.from_register(entity)
-        self._publish_message(message)
+        # Publish the register
+        self._publish_message(entity)
         
         return entity.id
     
@@ -76,9 +74,8 @@ class IfcBus:
         # Update entity register
         entity.update(data)
         
-        # Create and publish message
-        message = IfcMessage.from_register(entity)
-        self._publish_message(message)
+        # Publish the register
+        self._publish_message(entity)
     
     def add_relationship(self, source_id: UUID, rel_type: str, target_id: UUID, rel_data: Dict[str, Any] = None):
         """Add a relationship between entities."""
@@ -97,36 +94,36 @@ class IfcBus:
         # Add relationship
         source.add_relationship(rel_type, target_id, rel_data)
         
-        # Create and publish message
-        message = IfcMessage.from_register(source)
-        self._publish_message(message)
+        # Publish the register
+        self._publish_message(source)
     
-    def _publish_message(self, message: IfcMessage):
-        """Publish an IFC message."""
-        # First update our own register
-        if message.id not in self._registers:
-            # Create new register from message
-            self._registers[message.id] = message.to_register()
-            print(f"Created new register for {message.id}")
-        else:
-            # Merge with existing register
-            register = self._registers[message.id]
-            register.merge(message.to_register())
-            print(f"Updated register for {message.id}")
+    def _publish_message(self, register: IfcRegister):
+        """Publish an IFC register."""
+        # Get topic for this entity type
+        topic_name = f"ifc/{register.entity_type}"
         
-        # Then publish to others
-        topic_name = f"ifc/{message.entity_type}"
+        # Create publisher if needed
         if topic_name not in self._publishers:
             topic = Topic(topic_name)
             self._publishers[topic_name] = Publisher(topic)
             self._publishers[topic_name].advertise()
             print(f"Created new publisher for {topic_name}")
         
-        # Convert message to dict for MQTT
-        msg_dict = message.to_dict()
+        # Convert register to dict for MQTT
+        msg_dict = {
+            "id": str(register.id),
+            "entity_type": register.entity_type,
+            "replica_id": self.replica_id,  # Use our replica ID
+            "timestamp": register.timestamp,
+            "data": register.data,
+            "relationships": register.relationships,
+            "crdt_data": base64.b64encode(register.to_binary()).decode('utf-8'),  # Include CRDT data
+        }
+
+        # Publish message
         msg = Message(msg_dict)
         self._publishers[topic_name].publish(msg)
-        print(f"Published message to {topic_name}")
+        print(f"Published message to {topic_name} with data: {register.data}")
         
         # Log the message
         log_entry = {
@@ -138,54 +135,55 @@ class IfcBus:
         with open(self.log_file, "a") as f:
             f.write(json.dumps(log_entry) + "\n")
         
-    def _handle_message(self, topic: Topic, message: Message):
+    def _handle_message(self, message: Message):
         """Handle incoming messages."""
         try:
-            print(f"Received message on topic {topic.name}")
-            
             # Get payload from message
             payload = message.data
-            # print(f"Message payload: {payload}")
             
-            # Create message from payload
-            message = IfcMessage.from_dict(payload)
-            print(f"Created message object for {message.id}")
+            # Skip our own messages
+            if payload.get("replica_id") == self.replica_id:
+                return
             
-            # Convert to register and merge
-            if message.id not in self._registers:
-                self._registers[message.id] = message.to_register()
-                print(f"Created new register for {message.id}")
+            # Get message ID and CRDT data
+            msg_id = UUID(payload["id"])
+            crdt_data = base64.b64decode(payload["crdt_data"].encode('utf-8'))
+            
+            # Create or update register using CRDT data
+            incoming_register = IfcRegister.from_binary(crdt_data, payload["replica_id"], msg_id)
+            print(f"Received data: {incoming_register.data} from {payload['replica_id']}")
+            
+            if msg_id not in self._registers:
+                # Create new register
+                self._registers[msg_id] = incoming_register
+                print(f"Created new register for {msg_id}")
             else:
-                register = self._registers[message.id]
-                old_state = register.to_binary()
-                register.merge(message.to_register())
-                new_state = register.to_binary()
-                print(f"Updated register for {message.id}")
+                # Get the current register
+                current_register = self._registers[msg_id]
+                print(f"Current data: {current_register.data}")
                 
-                # Only broadcast if there were actual changes and message is from another replica
-                if old_state != new_state and payload.get("replica_id") != self.replica_id:
-                    print(f"Broadcasting changes for {message.id}")
-                    self._publish_message(IfcMessage(
-                        id=message.id,
-                        entity_type=register.entity_type,
-                        crdt_data=new_state,
-                        replica_id=self.replica_id,
-                        timestamp=register.timestamp
-                    ))
+                # Always merge CRDT data
+                old_data = current_register.data.copy()
+                current_register.merge(incoming_register)
+                print(f"Merged data: {current_register.data}")
+                
+                # Re-broadcast if data changed
+                if current_register.data != old_data:
+                    print(f"Re-broadcasting changes for {msg_id}")
+                    self._publish_message(current_register)
         except Exception as e:
             print(f"Error handling message: {e}")
         
-    def subscribe_to_entity(self, entity_type: str, callback: Callable[[Topic, Message], None]):
-        """Subscribe to messages for a specific entity type."""
-        print(f"Subscribing to {entity_type} messages")
-        
-        # Subscribe to messages for this entity type
-        topic_name = f"ifc/{entity_type}"
-        if topic_name not in self._subscribers:
-            topic = Topic(topic_name)
-            self._subscribers[topic_name] = Subscriber(
-                topic,
-                lambda msg: self._handle_message(topic, msg)
-            )
-            self._subscribers[topic_name].subscribe()
-            print(f"Created new subscriber for {topic_name}")
+    def _subscribe_to_all_entities(self):
+        """Subscribe to all IFC entity topics."""
+        entity_types = ["IfcWall", "IfcWindow", "IfcDoor"]
+        for entity_type in entity_types:
+            topic_name = f"ifc/{entity_type}"
+            if topic_name not in self._subscribers:
+                topic = Topic(topic_name)
+                self._subscribers[topic_name] = Subscriber(
+                    topic,
+                    self._handle_message
+                )
+                self._subscribers[topic_name].subscribe()
+                print(f"Created new subscriber for {topic_name}")
