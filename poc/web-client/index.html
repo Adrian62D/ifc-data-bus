@@ -117,14 +117,84 @@
         });
     });
 
-    client.on('message', (receivedTopic, payload) => {
-        const message = payload.toString();
-        console.log(`Message received on ${receivedTopic}: ${message}`);
-
+    client.on('message', function(receivedTopic, message) {
         const messagesDiv = document.getElementById('messages');
         const messageElement = document.createElement('div');
         messageElement.className = 'p-4 border-l-4 border-blue-500 bg-blue-50 text-blue-700 rounded shadow';
-        messageElement.innerHTML = `<strong>Topic:</strong> ${receivedTopic}<br><strong>Message:</strong> ${message}`;
+        
+        try {
+            // Try to parse the message as JSON
+            const parsedMessage = JSON.parse(message);
+            
+            // Create a table to display the JSON
+            const table = document.createElement('table');
+            table.classList.add('json-table');
+            
+            // Create table header
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            const topicHeader = document.createElement('th');
+            topicHeader.textContent = 'Topic';
+            const keyHeader = document.createElement('th');
+            keyHeader.textContent = 'Key';
+            const valueHeader = document.createElement('th');
+            valueHeader.textContent = 'Value';
+            headerRow.appendChild(topicHeader);
+            headerRow.appendChild(keyHeader);
+            headerRow.appendChild(valueHeader);
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+            
+            // Create table body
+            const tbody = document.createElement('tbody');
+            
+            // Recursively process nested objects
+            function processObject(obj, parentKey = '') {
+                for (const [key, value] of Object.entries(obj)) {
+                    const fullKey = parentKey ? `${parentKey}.${key}` : key;
+                    
+                    // Handle nested objects and arrays
+                    if (value !== null && typeof value === 'object') {
+                        processObject(value, fullKey);
+                        continue;
+                    }
+                    
+                    // Create row for each key-value pair
+                    const row = document.createElement('tr');
+                    
+                    // Topic cell (only for the first row)
+                    const topicCell = document.createElement('td');
+                    topicCell.textContent = receivedTopic;
+                    row.appendChild(topicCell);
+                    
+                    // Key cell
+                    const keyCell = document.createElement('td');
+                    keyCell.textContent = fullKey;
+                    row.appendChild(keyCell);
+                    
+                    // Value cell
+                    const valueCell = document.createElement('td');
+                    valueCell.textContent = value === null ? 'null' : value.toString();
+                    row.appendChild(valueCell);
+                    
+                    tbody.appendChild(row);
+                }
+            }
+            
+            // Process the JSON data
+            processObject(parsedMessage);
+            
+            // Add body to table
+            table.appendChild(tbody);
+            
+            // Set the table as the message content
+            messageElement.innerHTML = '';
+            messageElement.appendChild(table);
+        } catch (error) {
+            // If not a valid JSON, display the original message
+            messageElement.innerHTML = `<strong>Topic:</strong> ${receivedTopic}<br><strong>Message:</strong> ${message}`;
+        }
+        
         messagesDiv.prepend(messageElement);
     });
 
@@ -173,6 +243,82 @@
             publishStatus.className = 'mt-4 text-red-600';
         }
     });
+
+    function displayJsonAsTable(jsonData) {
+        // Parse the JSON if it's a string
+        const data = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
+        
+        // Create table element
+        const table = document.createElement('table');
+        table.classList.add('json-table');
+        
+        // Create table header
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        const keyHeader = document.createElement('th');
+        keyHeader.textContent = 'Key';
+        const valueHeader = document.createElement('th');
+        valueHeader.textContent = 'Value';
+        headerRow.appendChild(keyHeader);
+        headerRow.appendChild(valueHeader);
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+        
+        // Create table body
+        const tbody = document.createElement('tbody');
+        
+        // Recursively process nested objects
+        function processObject(obj, parentKey = '') {
+            for (const [key, value] of Object.entries(obj)) {
+                const fullKey = parentKey ? `${parentKey}.${key}` : key;
+                
+                // Handle nested objects and arrays
+                if (value !== null && typeof value === 'object') {
+                    processObject(value, fullKey);
+                    continue;
+                }
+                
+                // Create row for each key-value pair
+                const row = document.createElement('tr');
+                const keyCell = document.createElement('td');
+                keyCell.textContent = fullKey;
+                const valueCell = document.createElement('td');
+                valueCell.textContent = value === null ? 'null' : value.toString();
+                
+                row.appendChild(keyCell);
+                row.appendChild(valueCell);
+                tbody.appendChild(row);
+            }
+        }
+        
+        // Process the JSON data
+        processObject(data);
+        
+        // Add body to table
+        table.appendChild(tbody);
+        
+        // Clear previous content and append new table
+        const container = document.getElementById('json-display');
+        container.innerHTML = '';
+        container.appendChild(table);
+    }
+
 </script>
+    
+<style>
+    .json-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    .json-table th, .json-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    .json-table thead {
+        background-color: #f2f2f2;
+    }
+</style>
 </body>
 </html>
