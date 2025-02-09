@@ -14,7 +14,7 @@ COPY . .
 RUN pip install --no-cache-dir compas_eve>=1.0.0 automerge==1.0.0rc1 python-dotenv>=1.0.0
 
 # Build and install the local package
-RUN python setup.py build install
+RUN python setup_docker.py build install
 
 # Set default environment variables
 ENV MQTT_HOST=nanomq-broker
