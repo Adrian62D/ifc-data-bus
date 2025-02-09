@@ -1,16 +1,16 @@
 #include "ResourceIds.hpp"
 
 'STR#' ID_ADDON_INFO "Add-on Name and Description" {
-/* [  1] */		"vyzn Component Manager"
-/* [  2] */		"vyzn Component Manager Description"
+/* [  1] */		"IFC DATA BUS"
+/* [  2] */		"IFC DATA BUS"
 }
 
 'STR#' ID_ADDON_MENU "Strings for the Menu" {
-/* [  1] */		"Example AddOn Command... ^E3 ^ES ^EE ^EI ^ED ^ET ^10001"
+/* [  1] */		"IFC DATA BUS... ^E3 ^ES ^EE ^EI ^ED ^ET ^10001"
 }
 
-'GDLG' ID_ADDON_DLG Modal | grow   40   40  345  128  "Component Manager 8" {
-/* [  1] */ Button				  245   95   90   23	LargePlain  "OK"
+'GDLG' ID_ADDON_DLG Modal | grow   40   40  345  128  "IFC DATA BUS" {
+/* [  1] */ Button				  245   95   90   23	LargePlain  "Publish"
 /* [  2] */ Button				  145   95   90   23	LargePlain  "Cancel"
 /* [  3] */ Separator			   10   83  325    2
 }
